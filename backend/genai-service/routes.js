@@ -1,10 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const { generateText } = require("./service");
-console.log("API KEY EXISTS:", !!process.env.API_KEY);
-router.get("/test", (req, res) => {
-  res.json({ message: "Service is working genai-service" });
-});
+
+
 
 router.post("/generate", async (req, res) => {
   try {
