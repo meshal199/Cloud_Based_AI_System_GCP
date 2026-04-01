@@ -12,17 +12,14 @@ app.use(express.json());
 const PORT = process.env.PORT || 3001;
 const BASE_URL = "https://api.openweathermap.org/data/2.5/weather";
 
-// Test route
-app.get("/", (req, res) => {
-  res.send("Weather Service is running");
-});
+
 
 // Main weather route
 app.get("/api/weather/:city", async (req, res) => {
   try {
     const city = req.params.city;
 
-    // Debug (remove later)
+
     console.log("City:", city);
     console.log("API KEY:", process.env.API_KEY);
 
@@ -35,7 +32,7 @@ app.get("/api/weather/:city", async (req, res) => {
     });
 
     const data = response.data;
-console.log(data)
+
     res.json({
       city: data.name,
       country: data.sys.country,

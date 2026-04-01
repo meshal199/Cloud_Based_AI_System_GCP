@@ -8,25 +8,81 @@ export default function GenAIPage() {
   const [type, setType] = useState("text");
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [savedMessage, setSavedMessage] = useState("");
+  const [lastPrompt, setLastPrompt] = useState("");
+  const [saving, setSaving] = useState(false);
 
   const handleGenerate = async () => {
     if (!prompt.trim()) return;
 
     setLoading(true);
+    setError("");
+    setSavedMessage("");
+    setResult("");
 
-    // temporary fake result until backend is connected
-    setTimeout(() => {
-      if (type === "text") {
-        setResult(
-          `Generated response for: "${prompt}". This is a sample AI output preview.`
-        );
-      } else {
-        setResult(
-          "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=900&q=80"
-        );
+    try {
+      if (type === "image") {
+        setError("Image generation is not connected yet. Please use Text Output for now.");
+        return;
       }
+
+      const response = await fetch("http://localhost:3002/api/genai/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ prompt }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Generation failed");
+      }
+
+      setResult(data.result);
+      setLastPrompt(prompt);
+      setPrompt("");
+    } catch (err) {
+      setError(err.message || "Something went wrong while generating content.");
+    } finally {
       setLoading(false);
-    }, 1200);
+    }
+  };
+
+  const handleSaveResult = async () => {
+    if (!result) return;
+
+    setSaving(true);
+    setSavedMessage("");
+    setError("");
+
+    try {
+      const response = await fetch("http://localhost:3003/api/history", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          prompt: lastPrompt,
+          result,
+          type,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Failed to save result");
+      }
+
+      setSavedMessage("Result saved successfully.");
+    } catch (err) {
+      setError(err.message || "Failed to save result.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -96,9 +152,26 @@ export default function GenAIPage() {
             />
           </div>
 
+          {error && (
+            <div className="mb-4 rounded-2xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-red-200">
+              {error}
+            </div>
+          )}
+
+          {savedMessage && (
+            <div className="mb-4 rounded-2xl border border-green-400/30 bg-green-500/10 px-4 py-3 text-green-200">
+              {savedMessage}
+            </div>
+          )}
+
           <button
             onClick={handleGenerate}
-            className="w-full py-3 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 font-semibold hover:scale-[1.01] transition"
+            disabled={!prompt.trim() || loading}
+            className={`w-full py-3 rounded-2xl font-semibold transition ${
+              !prompt.trim() || loading
+                ? "bg-gray-500/40 cursor-not-allowed"
+                : "bg-gradient-to-r from-purple-500 to-pink-500 hover:scale-[1.01]"
+            }`}
           >
             {loading ? "Generating..." : "Generate"}
           </button>
@@ -110,7 +183,7 @@ export default function GenAIPage() {
             This section will show the generated result from your AI service.
           </p>
 
-          {!result && !loading && (
+          {!result && !loading && !error && (
             <div className="h-[360px] rounded-2xl border border-dashed border-white/20 flex items-center justify-center text-gray-400 text-center px-6">
               Your generated output will appear here.
             </div>
@@ -123,8 +196,22 @@ export default function GenAIPage() {
           )}
 
           {!loading && result && type === "text" && (
-            <div className="rounded-2xl bg-white/5 border border-white/10 p-6 text-gray-100 leading-7">
-              {result}
+            <div className="space-y-4">
+              <div className="rounded-2xl bg-white/5 border border-white/10 p-6 text-gray-100 leading-7 whitespace-pre-wrap">
+                {result}
+              </div>
+
+              <button
+                onClick={handleSaveResult}
+                disabled={saving}
+                className={`w-full py-3 rounded-2xl font-semibold transition ${
+                  saving
+                    ? "bg-gray-500/40 cursor-not-allowed"
+                    : "bg-gradient-to-r from-emerald-500 to-teal-500 hover:scale-[1.01]"
+                }`}
+              >
+                {saving ? "Saving..." : "Save Result"}
+              </button>
             </div>
           )}
 
