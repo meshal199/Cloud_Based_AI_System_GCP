@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import axios from 'axios'
 export default function GenAIPage() {
   const navigate = useNavigate();
 
@@ -13,43 +13,51 @@ export default function GenAIPage() {
   const [lastPrompt, setLastPrompt] = useState("");
   const [saving, setSaving] = useState(false);
 
-  const handleGenerate = async () => {
-    if (!prompt.trim()) return;
+const handleGenerate = async () => {
+  if (!prompt.trim()) return;
 
-    setLoading(true);
-    setError("");
-    setSavedMessage("");
-    setResult("");
+  setLoading(true);
+  setError("");
+  setSavedMessage("");
+  setResult("");
 
-    try {
-      if (type === "image") {
-        setError("Image generation is not connected yet. Please use Text Output for now.");
-        return;
-      }
+  try {
+    // IMAGE
+    if (type === "image") {
+      const { data } = await axios.post(
+        "http://localhost:3002/api/genai/generateImage",
+        { prompt }
+      );
 
-      const response = await fetch("http://localhost:3002/api/genai/generate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ prompt }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        throw new Error(data.message || "Generation failed");
+      if (!data.success) {
+        throw new Error(data.message || "Image generation failed");
       }
 
       setResult(data.result);
       setLastPrompt(prompt);
       setPrompt("");
-    } catch (err) {
-      setError(err.message || "Something went wrong while generating content.");
-    } finally {
-      setLoading(false);
+      return;
     }
-  };
+
+    // TEXT
+    const { data } = await axios.post(
+      "http://localhost:3002/api/genai/generatetext",
+      { prompt }
+    );
+
+    if (!data.success) {
+      throw new Error(data.message || "Generation failed");
+    }
+
+    setResult(data.result);
+    setLastPrompt(prompt);
+    setPrompt("");
+  } catch (err) {
+    setError(err.response?.data?.message || err.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleSaveResult = async () => {
     if (!result) return;
@@ -216,12 +224,26 @@ export default function GenAIPage() {
           )}
 
           {!loading && result && type === "image" && (
-            <div className="rounded-2xl overflow-hidden border border-white/10 bg-white/5">
-              <img
-                src={result}
-                alt="Generated preview"
-                className="w-full h-[360px] object-cover"
-              />
+            <div className="space-y-4">
+              <div className="rounded-2xl overflow-hidden border border-white/10 bg-white/5 flex items-center justify-center h-[360px]">
+                <img
+                  src={result}
+                  alt="Generated preview"
+                  className="max-w-full max-h-full object-contain"
+                />
+              </div>
+
+              <button
+                onClick={handleSaveResult}
+                disabled={saving}
+                className={`w-full py-3 rounded-2xl font-semibold transition ${
+                  saving
+                    ? "bg-gray-500/40 cursor-not-allowed"
+                    : "bg-gradient-to-r from-emerald-500 to-teal-500 hover:scale-[1.01]"
+                }`}
+              >
+                {saving ? "Saving..." : "Save Result"}
+              </button>
             </div>
           )}
         </div>

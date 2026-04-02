@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const { generateText } = require("./service");
+const { generateText , generateImage} = require("./service");
 
 
 
-router.post("/generate", async (req, res) => {
+router.post("/generateText", async (req, res) => {
   try {
     const { prompt } = req.body;
 
@@ -32,5 +32,32 @@ router.post("/generate", async (req, res) => {
     });
   }
 });
+
+router.post('/generateImage', async (req,res)=>{
+  try{
+  const {prompt} = req.body
+  console.log(prompt)
+      if (!prompt || !prompt.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Prompt is required",
+      });
+    }
+    const result = await generateImage(prompt)
+    res.json({
+      success: true,
+      result: result,
+
+    });
+  }catch (error) {
+    console.error("IMAGE ERROR:", error.message);
+
+    res.status(500).json({
+      success: false,
+      message: error.message || "Image generation failed",
+    });
+  }
+
+})
 
 module.exports = router;
