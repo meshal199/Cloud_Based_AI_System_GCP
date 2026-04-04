@@ -35,6 +35,7 @@ const handleGenerate = async () => {
 
       setResult(data.result);
       setLastPrompt(prompt);
+      
       setPrompt("");
       return;
     }
@@ -67,23 +68,25 @@ const handleGenerate = async () => {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:3003/api/history", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          prompt: lastPrompt,
-          result,
-          type,
-        }),
-      });
+      const response = await axios.post("http://localhost:3003/save", { lastPrompt, result,type })
+      // const response = await fetch("http://localhost:3003/api/history", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify({
+      //     prompt: lastPrompt,
+      //     result,
+      //     type,
+      //   }),
+      // });
+      console.log(lastPrompt, result, type)
+      // const data = await response.json();
+      // console.log('correct saved', data)
 
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        throw new Error(data.message || "Failed to save result");
-      }
+      // if (!response.ok || !data.success) {
+      //   throw new Error(data.message || "Failed to save result");
+      // }
 
       setSavedMessage("Result saved successfully.");
     } catch (err) {

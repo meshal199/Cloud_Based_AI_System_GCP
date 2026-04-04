@@ -1,33 +1,26 @@
 import { useNavigate } from "react-router-dom";
-
+import { useState, useEffect } from "react";
 export default function HistoryPage() {
+  const [data, setData] = useState([])
+  const fetch_data = async()=>{
+const response = await fetch('http://localhost:3003/data', {
+      method: "GET"
+    })
+    const data_receivced = await response.json()
+    setData(data_receivced.data)
+   
+
+  }
+    useEffect(() => {
+    fetch_data();
+  },);
+ 
   const navigate = useNavigate();
 
-  // temporary dummy data until backend is connected
-  const historyItems = [
-    {
-      id: 1,
-      service: "Weather",
-      title: "Weather for Jeddah",
-      content: "Temperature: 32°C, clear sky, humidity 58%",
-      date: "2026-04-01 10:30 AM",
-    },
-    {
-      id: 2,
-      service: "GenAI",
-      title: "Text Generation",
-      content: "Generated a travel plan for a 3-day trip in Riyadh.",
-      date: "2026-04-01 11:15 AM",
-    },
-    {
-      id: 3,
-      service: "GenAI",
-      title: "Image Generation",
-      content: "Generated an AI image based on a sunset city skyline prompt.",
-      date: "2026-04-01 12:05 PM",
-    },
-  ];
 
+  const getdat = async()=>{
+   console.log(data)
+   }
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-emerald-900 to-teal-950 text-white p-6">
       <div className="flex justify-between items-center mb-10">
@@ -64,7 +57,7 @@ export default function HistoryPage() {
             </div>
 
             <div className="flex gap-3">
-              <button className="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl transition">
+              <button onClick={getdat} className="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl transition">
                 Filter
               </button>
               <button className="bg-red-500/80 hover:bg-red-500 px-4 py-2 rounded-xl transition">
@@ -74,8 +67,11 @@ export default function HistoryPage() {
           </div>
 
           <div className="space-y-4">
-            {historyItems.map((item) => (
+          
+            {data.map((item) => (
+              
               <div
+            
                 key={item.id}
                 className="bg-white/5 border border-white/10 rounded-2xl p-5 hover:bg-white/10 transition"
               >
@@ -99,20 +95,25 @@ export default function HistoryPage() {
                       <button className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition">
                         Delete
                       </button>
+                      
                     </div>
+                    
                   </div>
                 </div>
+                
               </div>
+              
             ))}
           </div>
 
-          {historyItems.length === 0 && (
+          {data.length === 0 && (
             <div className="text-center text-gray-400 py-16">
               No history found.
             </div>
           )}
         </div>
       </div>
+     
     </div>
   );
 }
