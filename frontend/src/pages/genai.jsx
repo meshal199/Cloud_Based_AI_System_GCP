@@ -1,80 +1,80 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from 'axios'
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 export default function GenAIPage() {
   const navigate = useNavigate();
 
-  const [prompt, setPrompt] = useState("");
-  const [type, setType] = useState("text");
-  const [result, setResult] = useState("");
+  const [prompt, setPrompt] = useState('');
+  const [type, setType] = useState('text');
+  const [result, setResult] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [savedMessage, setSavedMessage] = useState("");
-  const [lastPrompt, setLastPrompt] = useState("");
+  const [error, setError] = useState('');
+  const [savedMessage, setSavedMessage] = useState('');
+  const [lastPrompt, setLastPrompt] = useState('');
   const [saving, setSaving] = useState(false);
 
-const handleGenerate = async () => {
-  if (!prompt.trim()) return;
+  const handleGenerate = async () => {
+    if (!prompt.trim()) return;
 
-  setLoading(true);
-  setError("");
-  setSavedMessage("");
-  setResult("");
+    setLoading(true);
+    setError('');
+    setSavedMessage('');
+    setResult('');
 
-  try {
-    // IMAGE
-    if (type === "image") {
-      const { data } = await axios.post(
-        "http://localhost:3002/api/genai/generateImage",
-        { prompt }
-      );
+    try {
+      // IMAGE
+      if (type === 'image') {
+        const { data } = await axios.post('http://localhost:3002/api/genai/generateImage', {
+          prompt,
+        });
+
+        if (!data.success) {
+          throw new Error(data.message || 'Image generation failed');
+        }
+
+        setResult(data.result);
+        setLastPrompt(prompt);
+
+        setPrompt('');
+        return;
+      }
+
+      // TEXT
+      const { data } = await axios.post('http://localhost:3002/api/genai/generatetext', { prompt });
 
       if (!data.success) {
-        throw new Error(data.message || "Image generation failed");
+        throw new Error(data.message || 'Generation failed');
       }
 
       setResult(data.result);
       setLastPrompt(prompt);
-      
-      setPrompt("");
-      return;
+      setPrompt('');
+    } catch (err) {
+      setError(err.response?.data?.message || err.message);
+    } finally {
+      setLoading(false);
     }
-
-    // TEXT
-    const { data } = await axios.post(
-      "http://localhost:3002/api/genai/generatetext",
-      { prompt }
-    );
-
-    if (!data.success) {
-      throw new Error(data.message || "Generation failed");
-    }
-
-    setResult(data.result);
-    setLastPrompt(prompt);
-    setPrompt("");
-  } catch (err) {
-    setError(err.response?.data?.message || err.message);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const handleSaveResult = async () => {
     if (!result) return;
 
     setSaving(true);
-    setSavedMessage("");
-    setError("");
+    setSavedMessage('');
+    setError('');
 
     try {
-      const response = await axios.post("http://localhost:3003/save", { lastPrompt, result,type })
-      console.log(response)
-      console.log(lastPrompt, result, type)
-      
-      setSavedMessage("Result saved successfully.");
+      const response = await axios.post('http://localhost:3003/data', {
+        lastPrompt,
+        result,
+        type,
+      });
+      console.log(response);
+      console.log(lastPrompt, result, type);
+
+      setSavedMessage('Result saved successfully.');
     } catch (err) {
-      setError(err.message || "Failed to save result.");
+      setError(err.message || 'Failed to save result.');
     } finally {
       setSaving(false);
     }
@@ -83,15 +83,12 @@ const handleGenerate = async () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-900 to-indigo-950 text-white p-6">
       <div className="flex justify-between items-center mb-10">
-        <h1
-          onClick={() => navigate("/")}
-          className="text-2xl font-bold cursor-pointer"
-        >
+        <h1 onClick={() => navigate('/')} className="text-2xl font-bold cursor-pointer">
           🌐 Dashboard
         </h1>
 
         <button
-          onClick={() => navigate("/")}
+          onClick={() => navigate('/')}
           className="bg-white/10 px-4 py-2 rounded-lg hover:bg-white/20 transition"
         >
           ⬅ Back
@@ -102,33 +99,25 @@ const handleGenerate = async () => {
         <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/10">
           <div className="mb-8">
             <h2 className="text-4xl font-extrabold mb-3">🤖 GenAI Service</h2>
-            <p className="text-gray-300">
-              Enter a prompt and preview AI-generated content.
-            </p>
+            <p className="text-gray-300">Enter a prompt and preview AI-generated content.</p>
           </div>
 
           <div className="mb-6">
-            <label className="block mb-2 text-sm text-gray-300">
-              Generation Type
-            </label>
+            <label className="block mb-2 text-sm text-gray-300">Generation Type</label>
             <div className="grid grid-cols-2 gap-3">
               <button
-                onClick={() => setType("text")}
+                onClick={() => setType('text')}
                 className={`py-3 rounded-xl font-medium transition ${
-                  type === "text"
-                    ? "bg-purple-500 text-white"
-                    : "bg-white/10 hover:bg-white/20"
+                  type === 'text' ? 'bg-purple-500 text-white' : 'bg-white/10 hover:bg-white/20'
                 }`}
               >
                 Text Output
               </button>
 
               <button
-                onClick={() => setType("image")}
+                onClick={() => setType('image')}
                 className={`py-3 rounded-xl font-medium transition ${
-                  type === "image"
-                    ? "bg-pink-500 text-white"
-                    : "bg-white/10 hover:bg-white/20"
+                  type === 'image' ? 'bg-pink-500 text-white' : 'bg-white/10 hover:bg-white/20'
                 }`}
               >
                 Image Output
@@ -164,11 +153,11 @@ const handleGenerate = async () => {
             disabled={!prompt.trim() || loading}
             className={`w-full py-3 rounded-2xl font-semibold transition ${
               !prompt.trim() || loading
-                ? "bg-gray-500/40 cursor-not-allowed"
-                : "bg-gradient-to-r from-purple-500 to-pink-500 hover:scale-[1.01]"
+                ? 'bg-gray-500/40 cursor-not-allowed'
+                : 'bg-gradient-to-r from-purple-500 to-pink-500 hover:scale-[1.01]'
             }`}
           >
-            {loading ? "Generating..." : "Generate"}
+            {loading ? 'Generating...' : 'Generate'}
           </button>
         </div>
 
@@ -190,7 +179,7 @@ const handleGenerate = async () => {
             </div>
           )}
 
-          {!loading && result && type === "text" && (
+          {!loading && result && type === 'text' && (
             <div className="space-y-4">
               <div className="rounded-2xl bg-white/5 border border-white/10 p-6 text-gray-100 leading-7 whitespace-pre-wrap">
                 {result}
@@ -201,16 +190,16 @@ const handleGenerate = async () => {
                 disabled={saving}
                 className={`w-full py-3 rounded-2xl font-semibold transition ${
                   saving
-                    ? "bg-gray-500/40 cursor-not-allowed"
-                    : "bg-gradient-to-r from-emerald-500 to-teal-500 hover:scale-[1.01]"
+                    ? 'bg-gray-500/40 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:scale-[1.01]'
                 }`}
               >
-                {saving ? "Saving..." : "Save Result"}
+                {saving ? 'Saving...' : 'Save Result'}
               </button>
             </div>
           )}
 
-          {!loading && result && type === "image" && (
+          {!loading && result && type === 'image' && (
             <div className="space-y-4">
               <div className="rounded-2xl overflow-hidden border border-white/10 bg-white/5 flex items-center justify-center h-[360px]">
                 <img
@@ -225,11 +214,11 @@ const handleGenerate = async () => {
                 disabled={saving}
                 className={`w-full py-3 rounded-2xl font-semibold transition ${
                   saving
-                    ? "bg-gray-500/40 cursor-not-allowed"
-                    : "bg-gradient-to-r from-emerald-500 to-teal-500 hover:scale-[1.01]"
+                    ? 'bg-gray-500/40 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:scale-[1.01]'
                 }`}
               >
-                {saving ? "Saving..." : "Save Result"}
+                {saving ? 'Saving...' : 'Save Result'}
               </button>
             </div>
           )}
