@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 export default function HistoryPage() {
+  const CRUD_URL = 'https://crud-service-1077078254726.us-east1.run.app';
   const [data, setData] = useState([]);
   const [showConfirm, setShowConfirm] = useState(false);
   const [filter, setFilter] = useState('all');
@@ -12,7 +13,7 @@ export default function HistoryPage() {
 
   const deletSingle = async (id) => {
     try {
-      await axios.delete(`http://localhost:3003/data/${id}`);
+      await axios.delete(`${CRUD_URL}/data/${id}`);
       fetch_data();
     } catch (error) {
       console.error('Delete failed:', error);
@@ -21,7 +22,7 @@ export default function HistoryPage() {
 
   const deleteData = async () => {
     try {
-      await axios.delete('http://localhost:3003/data');
+      await axios.delete(`${CRUD_URL}/data`);
       fetch_data();
       setShowConfirm(false);
     } catch (error) {
@@ -31,7 +32,7 @@ export default function HistoryPage() {
 
   const fetch_data = async () => {
     try {
-      const response = await fetch('http://localhost:3003/data', {
+      const response = await fetch(`${CRUD_URL}/data`, {
         method: 'GET',
       });
       const data_receivced = await response.json();
@@ -109,7 +110,7 @@ export default function HistoryPage() {
           <div className="space-y-4">
             {filterData.map((item) => (
               <div
-                key={item._id}
+                key={item.id}
                 className="bg-white/5 border border-white/10 rounded-2xl p-5 hover:bg-white/10 transition"
               >
                 <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
@@ -123,11 +124,11 @@ export default function HistoryPage() {
                     {item.type === 'image' ? (
                       <div className="space-y-3">
                         <img
-                          src={item.result}
+                          src={item.fileUrl || item.result}
                           alt={item.title}
                           className="w-full max-w-sm h-52 object-cover rounded-xl border border-white/10"
                         />
-                        <p className="text-sm text-gray-300 break-all">{item.result}</p>
+                        <p className="text-sm text-gray-300 break-all">{item.fileUrl || item.result}</p>
                       </div>
                     ) : (
                       <p className="text-gray-300 leading-7 line-clamp-3">{item.result}</p>
@@ -148,7 +149,7 @@ export default function HistoryPage() {
                       </button>
 
                       <button
-                        onClick={() => deletSingle(item._id)}
+                        onClick={() => deletSingle(item.id)}
                         className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition"
                       >
                         Delete
@@ -234,12 +235,12 @@ export default function HistoryPage() {
                 {selectedItem.type === 'image' ? (
                   <div className="space-y-4">
                     <img
-                      src={selectedItem.result}
+                      src={selectedItem.fileUrl || selectedItem.result}
                       alt={selectedItem.title}
                       className="w-full max-h-[500px] object-contain rounded-xl border border-white/10 bg-black/20"
                     />
                     <div className="bg-white/5 border border-white/10 rounded-xl p-4 text-gray-300 break-all">
-                      {selectedItem.result}
+                      {selectedItem.fileUrl || selectedItem.result}
                     </div>
                   </div>
                 ) : (

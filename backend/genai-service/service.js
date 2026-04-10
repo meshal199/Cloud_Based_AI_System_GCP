@@ -1,5 +1,10 @@
 const axios = require("axios");
-console.log(process.env.HF_API_KEY)
+const {
+  InferenceClient,
+  InferenceClientError,
+  InferenceClientProviderApiError,
+} = require("@huggingface/inference");
+
 async function generateText(prompt) {
   const apiKey = process.env.API_KEY;
   const model = "gemini-2.5-flash";
@@ -19,38 +24,46 @@ async function generateText(prompt) {
   );
 }
 
-
-
 async function generateImage(prompt) {
   const apiKey = process.env.HF_API_KEY;
+  const client = new InferenceClient(apiKey);
+  const models = [
+    "black-forest-labs/FLUX.1-schnell",
+    "stabilityai/stable-diffusion-xl-base-1.0",
+  ];
+  let lastError;
 
-  try {
-    const response = await axios.post(
-      "https://router.huggingface.co/hf-inference/models/stabilityai/stable-diffusion-xl-base-1.0",
-      {
-        inputs: prompt
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-               Accept: "image/png",
+  for (const model of models) {
+    try {
+      return await client.textToImage(
+        {
+          provider: "hf-inference",
+          model,
+          inputs: prompt,
         },
-        responseType: "arraybuffer"
-      }
-    );
-
-    const base64 = Buffer.from(response.data).toString("base64");
-    return `data:image/png;base64,${base64}`;
-  } catch (error) {
-    const body = error.response?.data
-      ? Buffer.from(error.response.data).toString("utf8")
-      : error.message;
-
-    console.error("HF IMAGE ERROR:", error.response?.status, body);
-    throw new Error(`HF image failed: ${error.response?.status} ${body}`);
+        {
+          outputType: "dataUrl",
+        }
+      );
+    } catch (error) {
+      lastError = error;
+      console.error(`HF IMAGE ERROR (${model}):`, error.message);
+    }
   }
-}
 
+  if (lastError instanceof InferenceClientProviderApiError) {
+    throw new Error(
+      "Free Hugging Face image generation is currently unavailable for this account or model. Try again later or switch to text generation."
+    );
+  }
+
+  if (lastError instanceof InferenceClientError) {
+    throw new Error(`HF image failed: ${lastError.message}`);
+  }
+
+  throw new Error(
+    `HF image failed: ${lastError?.message || "Unknown image generation error"}`
+  );
+}
 
 module.exports = { generateText, generateImage };

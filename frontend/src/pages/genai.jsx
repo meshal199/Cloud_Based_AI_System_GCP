@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+
 export default function GenAIPage() {
   const navigate = useNavigate();
 
@@ -56,6 +57,8 @@ export default function GenAIPage() {
     }
   };
 
+  const CRUD_URL = 'https://crud-service-1077078254726.us-east1.run.app';
+
   const handleSaveResult = async () => {
     if (!result) return;
 
@@ -64,17 +67,33 @@ export default function GenAIPage() {
     setError('');
 
     try {
-      const response = await axios.post('http://localhost:3003/data', {
-        lastPrompt,
-        result,
-        type,
-      });
-      console.log(response);
+      let response;
+
+      if (type === 'image' && result.startsWith('data:image')) {
+        const imageBlob = await fetch(result).then((res) => res.blob());
+        const extension = imageBlob.type.split('/')[1] || 'png';
+        const formData = new FormData();
+
+        formData.append('lastPrompt', lastPrompt);
+        formData.append('type', type);
+        formData.append('image', imageBlob, `generated-image.${extension}`);
+
+        response = await axios.post(`${CRUD_URL}/data`, formData);
+      } else {
+        response = await axios.post(`${CRUD_URL}/data`, {
+          lastPrompt,
+          result,
+          type,
+        });
+      }
+
+      console.log(response.data);
       console.log(lastPrompt, result, type);
 
       setSavedMessage('Result saved successfully.');
     } catch (err) {
-      setError(err.message || 'Failed to save result.');
+      console.error(err);
+      setError(err.response?.data?.error || err.message || 'Failed to save result.');
     } finally {
       setSaving(false);
     }

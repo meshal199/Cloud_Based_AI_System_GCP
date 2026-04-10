@@ -1,0 +1,84 @@
+{
+  "info": {
+    "_postman_id": "4c1d7d98-3678-42b6-bf36-792b8b1d2d11",
+    "name": "GenAI Service",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Requests for the genai-service Express app."
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3002"
+    }
+  ],
+  "item": [
+    {
+      "name": "Generate Text",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"prompt\": \"Write a short welcome message for our dashboard.\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/genai/generateText",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "genai",
+            "generateText"
+          ]
+        },
+        "description": "Generate text from a prompt."
+      },
+      "response": []
+    },
+    {
+      "name": "Generate Image",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"prompt\": \"A futuristic smart city skyline at sunset, highly detailed.\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/genai/generateImage",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "genai",
+            "generateImage"
+          ]
+        },
+        "description": "Generate an image from a prompt and receive a base64 data URL."
+      },
+      "response": []
+    }
+  ]
+}
