@@ -66,7 +66,7 @@ export default function HistoryPage() {
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
           <h2 className="text-4xl font-extrabold mb-3">📜 History Service</h2>
-          <p className="text-gray-300">View saved weather requests and AI-generated results.</p>
+          <p className="text-gray-300">View saved AI-generated results.</p>
         </div>
 
         <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-6 shadow-2xl border border-white/10">
@@ -119,16 +119,11 @@ export default function HistoryPage() {
                       {item.type}
                     </div>
 
-                    <h4 className="text-xl font-semibold mb-2">{item.title}</h4>
+                    <h4 className="text-xl font-semibold mb-2">{item.prompt}</h4>
 
                     {item.type === 'image' ? (
-                      <div className="space-y-3">
-                        <img
-                          src={item.fileUrl || item.result}
-                          alt={item.title}
-                          className="w-full max-w-sm h-52 object-cover rounded-xl border border-white/10"
-                        />
-                        <p className="text-sm text-gray-300 break-all">{item.fileUrl || item.result}</p>
+                      <div className="rounded-xl border border-dashed border-white/15 bg-white/5 px-4 py-4 text-sm text-gray-300">
+                        TO view the image Click View to preview it.
                       </div>
                     ) : (
                       <p className="text-gray-300 leading-7 line-clamp-3">{item.result}</p>
@@ -198,19 +193,7 @@ export default function HistoryPage() {
       {selectedItem && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-slate-900 rounded-2xl p-6 w-full max-w-3xl shadow-2xl border border-white/10 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-start justify-between gap-4 mb-6">
-              <div>
-                <div className="inline-block text-xs px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-200 mb-3">
-                  {selectedItem.type}
-                </div>
-                <h3 className="text-2xl font-bold">{selectedItem.title}</h3>
-                <p className="text-sm text-gray-400 mt-2">
-                  {selectedItem.createdAt
-                    ? new Date(selectedItem.createdAt).toLocaleString()
-                    : 'No date'}
-                </p>
-              </div>
-
+            <div className="flex items-start justify-end gap-4 mb-6">
               <button
                 onClick={() => setSelectedItem(null)}
                 className="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg transition"
@@ -233,15 +216,12 @@ export default function HistoryPage() {
                 <h4 className="text-lg font-semibold mb-2 text-emerald-300">Result</h4>
 
                 {selectedItem.type === 'image' ? (
-                  <div className="space-y-4">
+                  <div>
                     <img
                       src={selectedItem.fileUrl || selectedItem.result}
-                      alt={selectedItem.title}
+                      alt="Saved result"
                       className="w-full max-h-[500px] object-contain rounded-xl border border-white/10 bg-black/20"
                     />
-                    <div className="bg-white/5 border border-white/10 rounded-xl p-4 text-gray-300 break-all">
-                      {selectedItem.fileUrl || selectedItem.result}
-                    </div>
                   </div>
                 ) : (
                   <div className="bg-white/5 border border-white/10 rounded-xl p-4 text-gray-200 whitespace-pre-wrap break-words leading-7">
