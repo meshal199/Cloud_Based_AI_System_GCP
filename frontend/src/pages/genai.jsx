@@ -13,6 +13,7 @@ export default function GenAIPage() {
   const [savedMessage, setSavedMessage] = useState('');
   const [lastPrompt, setLastPrompt] = useState('');
   const [saving, setSaving] = useState(false);
+  const API_GATEWAY_URL = 'https://coe558-gateway-dqswl092.ue.gateway.dev';
 
   const handleGenerate = async () => {
     if (!prompt.trim()) return;
@@ -25,7 +26,7 @@ export default function GenAIPage() {
     try {
       // IMAGE
       if (type === 'image') {
-        const { data } = await axios.post('http://localhost:3002/api/genai/generateImage', {
+        const { data } = await axios.post(`${API_GATEWAY_URL}/genai/generateImage`, {
           prompt,
         });
 
@@ -41,7 +42,7 @@ export default function GenAIPage() {
       }
 
       // TEXT
-      const { data } = await axios.post('http://localhost:3002/api/genai/generatetext', { prompt });
+      const { data } = await axios.post(`${API_GATEWAY_URL}/genai/generateText`, { prompt });
 
       if (!data.success) {
         throw new Error(data.message || 'Generation failed');
@@ -56,8 +57,6 @@ export default function GenAIPage() {
       setLoading(false);
     }
   };
-
-  const CRUD_URL = 'https://crud-service-1077078254726.us-east1.run.app';
 
   const handleSaveResult = async () => {
     if (!result) return;
@@ -78,9 +77,9 @@ export default function GenAIPage() {
         formData.append('type', type);
         formData.append('image', imageBlob, `generated-image.${extension}`);
 
-        response = await axios.post(`${CRUD_URL}/data`, formData);
+        response = await axios.post(`${API_GATEWAY_URL}/data`, formData);
       } else {
-        response = await axios.post(`${CRUD_URL}/data`, {
+        response = await axios.post(`${API_GATEWAY_URL}/data`, {
           lastPrompt,
           result,
           type,

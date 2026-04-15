@@ -1,14 +1,14 @@
-import { useEffect, useRef, useState } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 export default function WeatherPage() {
   const navigate = useNavigate();
 
-  const [city, setCity] = useState("");
+  const [city, setCity] = useState('');
   const [weather, setWeather] = useState(null);
   const [loadingWeather, setLoadingWeather] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   const [suggestions, setSuggestions] = useState([]);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
@@ -16,6 +16,7 @@ export default function WeatherPage() {
 
   const containerRef = useRef(null);
   const debounceRef = useRef(null);
+  const API_GATEWAY_URL = 'https://coe558-gateway-dqswl092.ue.gateway.dev';
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -24,9 +25,9 @@ export default function WeatherPage() {
       }
     }
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
   }, []);
@@ -41,22 +42,22 @@ export default function WeatherPage() {
     try {
       setLoadingSuggestions(true);
 
-      const response = await axios.get("https://nominatim.openstreetmap.org/search", {
+      const response = await axios.get('https://nominatim.openstreetmap.org/search', {
         params: {
           q: value,
-          format: "jsonv2",
+          format: 'jsonv2',
           addressdetails: 1,
           limit: 6,
         },
         headers: {
-          Accept: "application/json",
+          Accept: 'application/json',
         },
       });
 
       setSuggestions(response.data);
       setShowDropdown(true);
     } catch (error) {
-      console.error("City search error:", error);
+      console.error('City search error:', error);
       setSuggestions([]);
       setShowDropdown(true);
     } finally {
@@ -68,7 +69,7 @@ export default function WeatherPage() {
     const value = e.target.value;
     setCity(value);
     setWeather(null);
-    setError('')
+    setError('');
 
     if (debounceRef.current) clearTimeout(debounceRef.current);
 
@@ -84,7 +85,7 @@ export default function WeatherPage() {
       item.address?.village ||
       item.address?.municipality ||
       item.name ||
-      item.display_name.split(",")[0];
+      item.display_name.split(',')[0];
 
     setCity(cityName);
     setSuggestions([]);
@@ -98,21 +99,21 @@ export default function WeatherPage() {
       setLoadingWeather(true);
 
       const response = await axios.get(
-        `http://localhost:3001/api/weather/${encodeURIComponent(selectedCity)}`
+        `${API_GATEWAY_URL}/weather/${encodeURIComponent(selectedCity)}`
       );
 
       setWeather(response.data);
       setShowDropdown(false);
     } catch (error) {
-  console.error("Weather fetch error:", error);
-  setError("City not found or failed to fetch weather.");
-} finally {
+      console.error('Weather fetch error:', error);
+      setError('City not found or failed to fetch weather.');
+    } finally {
       setLoadingWeather(false);
     }
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       getWeather();
     }
   };
@@ -120,15 +121,12 @@ export default function WeatherPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-900 to-indigo-900 text-white p-6">
       <div className="flex justify-between items-center mb-10">
-        <h1
-          onClick={() => navigate("/")}
-          className="text-2xl font-bold cursor-pointer"
-        >
+        <h1 onClick={() => navigate('/')} className="text-2xl font-bold cursor-pointer">
           🌐 Dashboard
         </h1>
 
         <button
-          onClick={() => navigate("/")}
+          onClick={() => navigate('/')}
           className="bg-white/10 px-4 py-2 rounded-lg hover:bg-white/20 transition"
         >
           ⬅ Back
@@ -137,9 +135,7 @@ export default function WeatherPage() {
 
       <div className="text-center mb-10">
         <h2 className="text-4xl font-extrabold mb-2">🌤 Weather Service</h2>
-        <p className="text-gray-300">
-          Search for a city and view its current weather
-        </p>
+        <p className="text-gray-300">Search for a city and view its current weather</p>
       </div>
 
       <div ref={containerRef} className="max-w-2xl mx-auto relative">
@@ -160,14 +156,14 @@ export default function WeatherPage() {
             onClick={() => getWeather()}
             className="bg-blue-500 hover:bg-blue-600 px-6 py-3 rounded-xl transition"
           >
-            {loadingWeather ? "Loading..." : "Search"}
+            {loadingWeather ? 'Loading...' : 'Search'}
           </button>
         </div>
-{error && (
-  <div className="mt-4 bg-red-500/10 border border-red-500/30 text-red-300 px-4 py-3 rounded-xl text-sm">
-    ⚠ {error}
-  </div>
-)}
+        {error && (
+          <div className="mt-4 bg-red-500/10 border border-red-500/30 text-red-300 px-4 py-3 rounded-xl text-sm">
+            ⚠ {error}
+          </div>
+        )}
         {showDropdown && city.trim() && (
           <div className="absolute z-50 mt-2 w-full bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl max-h-72 overflow-y-auto">
             {loadingSuggestions ? (
@@ -180,9 +176,9 @@ export default function WeatherPage() {
                   item.address?.village ||
                   item.address?.municipality ||
                   item.name ||
-                  item.display_name.split(",")[0];
+                  item.display_name.split(',')[0];
 
-                const countryLabel = item.address?.country || "";
+                const countryLabel = item.address?.country || '';
 
                 return (
                   <div
@@ -191,9 +187,7 @@ export default function WeatherPage() {
                     className="px-4 py-3 hover:bg-white/10 cursor-pointer transition border-b border-white/5 last:border-b-0"
                   >
                     <div className="font-medium">{cityLabel}</div>
-                    <div className="text-sm text-gray-400">
-                      {countryLabel || item.display_name}
-                    </div>
+                    <div className="text-sm text-gray-400">{countryLabel || item.display_name}</div>
                   </div>
                 );
               })
@@ -210,13 +204,9 @@ export default function WeatherPage() {
             {weather.city}, {weather.country}
           </h3>
 
-          <p className="text-6xl font-extrabold mb-4">
-            {weather.temperature}°C
-          </p>
+          <p className="text-6xl font-extrabold mb-4">{weather.temperature}°C</p>
 
-          <p className="text-xl mb-6 capitalize text-gray-200">
-            {weather.description}
-          </p>
+          <p className="text-xl mb-6 capitalize text-gray-200">{weather.description}</p>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
             <div className="bg-white/5 rounded-2xl p-4">

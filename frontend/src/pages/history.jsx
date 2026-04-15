@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 export default function HistoryPage() {
-  const CRUD_URL = 'https://crud-service-1077078254726.us-east1.run.app';
+  const API_GATEWAY_URL = 'https://coe558-gateway-dqswl092.ue.gateway.dev';
   const [data, setData] = useState([]);
   const [showConfirm, setShowConfirm] = useState(false);
   const [filter, setFilter] = useState('all');
@@ -13,7 +13,7 @@ export default function HistoryPage() {
 
   const deletSingle = async (id) => {
     try {
-      await axios.delete(`${CRUD_URL}/data/${id}`);
+      await axios.delete(`${API_GATEWAY_URL}/data/${id}`);
       fetch_data();
     } catch (error) {
       console.error('Delete failed:', error);
@@ -22,7 +22,7 @@ export default function HistoryPage() {
 
   const deleteData = async () => {
     try {
-      await axios.delete(`${CRUD_URL}/data`);
+      await axios.delete(`${API_GATEWAY_URL}/data`);
       fetch_data();
       setShowConfirm(false);
     } catch (error) {
@@ -32,7 +32,7 @@ export default function HistoryPage() {
 
   const fetch_data = async () => {
     try {
-      const response = await fetch(`${CRUD_URL}/data`, {
+      const response = await fetch(`${API_GATEWAY_URL}/data`, {
         method: 'GET',
       });
       const data_receivced = await response.json();

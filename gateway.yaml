@@ -1,0 +1,176 @@
+openapi: 3.0.0
+info:
+  title: coe558-api
+  version: 1.0.0
+  description: API Gateway for S1 Weather, S2 GenAI, and S3 CRUD services
+
+servers:
+  - url: https://coe558api.endpoints.coe558-252-project-meshal.cloud.goog
+    x-google-endpoint:
+      allowCors: true
+
+x-google-api-management:
+  apiName: coe558api
+  backends:
+    weather:
+      address: https://us-east1-coe558-252-project-meshal.cloudfunctions.net
+      pathTranslation: APPEND_PATH_TO_ADDRESS
+
+    genaiText:
+      address: https://genai-service-1077078254726.us-east1.run.app/api/genai/generateText
+      pathTranslation: CONSTANT_ADDRESS
+
+    genaiImage:
+      address: https://genai-service-1077078254726.us-east1.run.app/api/genai/generateImage
+      pathTranslation: CONSTANT_ADDRESS
+
+    crud:
+      address: https://crud-service-1077078254726.us-east1.run.app
+      pathTranslation: APPEND_PATH_TO_ADDRESS
+
+paths:
+  /weather/{city}:
+    options:
+      summary: CORS preflight for weather
+      operationId: corsWeatherByCity
+      x-google-backend: weather
+      parameters:
+        - name: city
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: CORS preflight
+
+    get:
+      summary: Get weather by city
+      operationId: getWeatherByCity
+      x-google-backend: weather
+      parameters:
+        - name: city
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Weather fetched successfully
+
+  /genai/generateText:
+    options:
+      summary: CORS preflight for text generation
+      operationId: corsGenerateText
+      x-google-backend: genaiText
+      responses:
+        '204':
+          description: CORS preflight
+
+    post:
+      summary: Generate text with GenAI
+      operationId: generateText
+      x-google-backend: genaiText
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Text generated successfully
+
+  /genai/generateImage:
+    options:
+      summary: CORS preflight for image generation
+      operationId: corsGenerateImage
+      x-google-backend: genaiImage
+      responses:
+        '204':
+          description: CORS preflight
+
+    post:
+      summary: Generate image with GenAI
+      operationId: generateImage
+      x-google-backend: genaiImage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Image generated successfully
+
+  /data:
+    options:
+      summary: CORS preflight for saved data
+      operationId: corsData
+      x-google-backend: crud
+      responses:
+        '204':
+          description: CORS preflight
+
+    get:
+      summary: Get all saved data
+      operationId: getAllData
+      x-google-backend: crud
+      responses:
+        '200':
+          description: Data fetched successfully
+
+    post:
+      summary: Save new data
+      operationId: createData
+      x-google-backend: crud
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+          multipart/form-data:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Data saved successfully
+
+    delete:
+      summary: Delete all data
+      operationId: deleteAllData
+      x-google-backend: crud
+      responses:
+        '200':
+          description: All data deleted successfully
+
+  /data/{id}:
+    options:
+      summary: CORS preflight for saved data by ID
+      operationId: corsDataById
+      x-google-backend: crud
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: CORS preflight
+
+    delete:
+      summary: Delete data by ID
+      operationId: deleteDataById
+      x-google-backend: crud
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Data deleted successfully
