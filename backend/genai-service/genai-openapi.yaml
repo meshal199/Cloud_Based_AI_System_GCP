@@ -1,0 +1,84 @@
+openapi: 3.0.0
+info:
+  title: GenAI Service API
+  version: 1.0.0
+  description: API for generating text and images using external GenAI providers
+
+servers:
+  - url: http://localhost:8080
+    description: Local server
+
+paths:
+  /api/genai/generateText:
+    post:
+      summary: Generate text from a prompt
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                prompt:
+                  type: string
+                  example: Write a short paragraph about cloud computing
+              required:
+                - prompt
+      responses:
+        "200":
+          description: Text generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  prompt:
+                    type: string
+                    example: Write a short paragraph about cloud computing
+                  result:
+                    type: string
+                    example: Cloud computing allows scalable access to computing resources over the internet.
+        "400":
+          description: Prompt is required
+        "500":
+          description: Text generation failed
+
+  /api/genai/generateImage:
+    post:
+      summary: Generate an image from a prompt
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                prompt:
+                  type: string
+                  example: A futuristic city at night
+              required:
+                - prompt
+      responses:
+        "200":
+          description: Image generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  prompt:
+                    type: string
+                    example: A futuristic city at night
+                  result:
+                    type: string
+                    example: data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...
+        "400":
+          description: Prompt is required
+        "500":
+          description: Image generation failed

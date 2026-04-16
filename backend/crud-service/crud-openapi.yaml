@@ -1,0 +1,107 @@
+openapi: 3.0.0
+info:
+  title: CRUD Service API
+  version: 1.0.0
+  description: API for saving, retrieving, and deleting generated data
+
+servers:
+  - url: http://localhost:8080
+    description: Local server
+
+paths:
+  /data:
+    post:
+      summary: Save data (text or image)
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                lastPrompt:
+                  type: string
+                  example: A futuristic city
+                result:
+                  type: string
+                  example: some text result
+                type:
+                  type: string
+                  example: text
+                image:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: Data saved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Saved
+                  id:
+                    type: string
+                  result:
+                    type: string
+                  fileUrl:
+                    type: string
+        "400":
+          description: Invalid input
+        "500":
+          description: Failed to save data
+
+    get:
+      summary: Get all saved data
+      responses:
+        "200":
+          description: List of data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        prompt:
+                          type: string
+                        title:
+                          type: string
+                        type:
+                          type: string
+                        result:
+                          type: string
+                        fileUrl:
+                          type: string
+                        createdAt:
+                          type: string
+
+    delete:
+      summary: Delete all data
+      responses:
+        "200":
+          description: All data deleted
+
+  /data/{id}:
+    delete:
+      summary: Delete one item by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Item deleted successfully
+        "404":
+          description: Item not found
+        "500":
+          description: Server error
