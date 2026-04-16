@@ -1,14 +1,18 @@
-require('dotenv').config();
+const express = require("express");
+const cors = require("cors");
+const routes = require("./routes");
+const swaggerUi = require("swagger-ui-express");
+const YAML = require("yamljs");
+const path = require("path");
 
-const express = require('express');
-const cors = require('cors');
-
-const weather = require('./routes');
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-app.use('/', weather);
+const swaggerDocument = YAML.load(path.join(__dirname, "weather-openapi.yaml"));
+
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use("/weather", routes);
 
 module.exports = app;

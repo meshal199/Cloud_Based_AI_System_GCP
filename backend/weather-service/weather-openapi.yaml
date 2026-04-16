@@ -1,0 +1,44 @@
+openapi: 3.0.0
+info:
+  title: Weather Service API
+  version: 1.0.0
+  description: API for fetching weather by city or coordinates
+
+servers:
+  - url: http://localhost:8080
+    description: Local
+
+paths:
+  /weather/coords:
+    get:
+      summary: Get weather by coordinates
+      parameters:
+        - name: lat
+          in: query
+          required: true
+          schema:
+            type: number
+            example: 21.5433
+        - name: lon
+          in: query
+          required: true
+          schema:
+            type: number
+            example: 39.1728
+      responses:
+        "200":
+          description: Weather fetched successfully
+
+  /weather/{city}:
+    get:
+      summary: Get weather by city
+      parameters:
+        - name: city
+          in: path
+          required: true
+          schema:
+            type: string
+            example: Jeddah
+      responses:
+        "200":
+          description: Weather fetched successfully
