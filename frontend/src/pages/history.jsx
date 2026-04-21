@@ -10,9 +10,10 @@ export default function HistoryPage() {
   const [selectedItem, setSelectedItem] = useState(null);
 
   const filterData = filter === 'all' ? data : data.filter((item) => item.type === filter);
-
+  console.log(selectedItem);
   const deletSingle = async (id) => {
     try {
+      console.log(id);
       await axios.delete(`${API_GATEWAY_URL}/data/${id}`);
       fetch_data();
     } catch (error) {

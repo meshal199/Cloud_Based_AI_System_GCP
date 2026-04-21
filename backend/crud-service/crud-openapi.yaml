@@ -5,8 +5,8 @@ info:
   description: API for saving, retrieving, and deleting generated data
 
 servers:
-  - url: http://localhost:8080
-    description: Local server
+  - url: https://crud-service-1077078254726.us-east1.run.app/
+    description: Cloud server
 
 paths:
   /data:
@@ -32,7 +32,7 @@ paths:
                   type: string
                   format: binary
       responses:
-        "200":
+        '200':
           description: Data saved successfully
           content:
             application/json:
@@ -48,15 +48,15 @@ paths:
                     type: string
                   fileUrl:
                     type: string
-        "400":
+        '400':
           description: Invalid input
-        "500":
+        '500':
           description: Failed to save data
 
     get:
       summary: Get all saved data
       responses:
-        "200":
+        '200':
           description: List of data
           content:
             application/json:
@@ -86,7 +86,7 @@ paths:
     delete:
       summary: Delete all data
       responses:
-        "200":
+        '200':
           description: All data deleted
 
   /data/{id}:
@@ -99,9 +99,9 @@ paths:
           schema:
             type: string
       responses:
-        "200":
+        '200':
           description: Item deleted successfully
-        "404":
+        '404':
           description: Item not found
-        "500":
+        '500':
           description: Server error
