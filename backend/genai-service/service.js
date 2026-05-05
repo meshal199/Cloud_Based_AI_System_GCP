@@ -3,7 +3,7 @@ const { InferenceClient } = require("@huggingface/inference");
 
 async function generateText(prompt) {
   const apiKey =
-    process.env.API_KEY || "AIzaSyCiJiYX-sD1tbZYnRRfE_IOmDGyH413x0g";
+    process.env.API_KEY ;
   if (!apiKey) {
     throw new Error("API_KEY is missing");
   }
@@ -27,7 +27,7 @@ async function generateText(prompt) {
 async function generateImage(prompt) {
   try {
     const apiKey =
-      process.env.HF_API_KEY || "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";
+      process.env.HF_API_KEY ;
 
     if (!apiKey) {
       throw new Error("HF_API_KEY is missing");
