@@ -7,7 +7,7 @@ async function getWeather(city) {
     const response = await axios.get(BASE_URL, {
       params: {
         q: city,
-        appid: process.env.API_KEY || "7db44a2c96402dfaca25eea804e80efe",
+        appid: process.env.API_KEY ,
         units: "metric",
       },
     });
